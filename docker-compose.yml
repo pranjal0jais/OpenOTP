@@ -1,0 +1,16 @@
+services:
+  otp-db:
+    image: mysql:8.0
+    container_name: opt_service_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - otp_data:/var/lib/mysql
+
+volumes:
+  otp_data:
