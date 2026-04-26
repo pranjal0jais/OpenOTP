@@ -17,7 +17,7 @@ import java.util.List;
 public class OtpCleanupService {
     private final OtpRepository otpRepository;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void cleanExpiredOtpRecords() {
         otpRepository.deleteAllByExpiresAtBefore(LocalDateTime.now());

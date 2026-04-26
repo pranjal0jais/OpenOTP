@@ -17,8 +17,11 @@ import java.util.UUID;
 public class OtpService {
     private final EmailService emailService;
     private final OtpRepository otpRepository;
-
+    private final RateLimiterService rateLimiterService;
     public void sendOtp(String to){
+        if(!rateLimiterService.consume(to)){
+            throw new RateLimitExceededException("Too many OTP requests. Try again later.");
+        }
         Optional<OtpRecord> existingOtp = otpRepository.findTopByEmailOrderByCreatedAtDesc(to);
         if(existingOtp.isPresent()){
             long difference = ChronoUnit.SECONDS.between(existingOtp.get().getCreatedAt(),

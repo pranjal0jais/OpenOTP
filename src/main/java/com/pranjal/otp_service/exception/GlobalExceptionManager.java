@@ -86,4 +86,14 @@ public class GlobalExceptionManager {
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .build());
     }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimit(RateLimitExceededException e) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ErrorResponse.builder()
+                        .message(e.getMessage())
+                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                        .build());
+    }
 }
