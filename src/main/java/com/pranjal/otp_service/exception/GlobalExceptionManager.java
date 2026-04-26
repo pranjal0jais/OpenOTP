@@ -16,7 +16,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.NOT_FOUND)
+                        .status("OTP_NOT_FOUND")
                         .statusCode(HttpStatus.NOT_FOUND.value())
                         .build());
     }
@@ -26,7 +26,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .status("INTERNAL_SERVER_ERROR")
                         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .build());
     }
@@ -36,7 +36,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.GONE)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.GONE)
+                        .status("OTP_EXPIRED")
                         .statusCode(HttpStatus.GONE.value())
                         .build());
     }
@@ -46,7 +46,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.BAD_REQUEST)
+                        .status("INVALID_OTP")
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .build());
     }
@@ -56,7 +56,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .status("RESEND_COOLDOWN")
                         .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
                         .build());
     }
@@ -66,7 +66,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .status("MAX_ATTEMPTS_REACHED")
                         .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
                         .build());
     }
@@ -82,7 +82,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.BAD_REQUEST)
+                        .status("INVALID_FORMAT")
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .build());
     }
@@ -92,7 +92,7 @@ public class GlobalExceptionManager {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(ErrorResponse.builder()
                         .message(e.getMessage())
-                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .status("RATE_LIMIT_EXCEEDED")
                         .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
                         .build());
     }

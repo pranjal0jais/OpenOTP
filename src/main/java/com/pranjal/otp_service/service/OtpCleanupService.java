@@ -1,6 +1,5 @@
 package com.pranjal.otp_service.service;
 
-import com.pranjal.otp_service.entity.OtpRecord;
 import com.pranjal.otp_service.repository.OtpRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
