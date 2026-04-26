@@ -41,4 +41,7 @@ public class OtpRecord {
 
     @Column
     private LocalDateTime verifiedAt;
+
+    @Column
+    private int attemptCount;
 }

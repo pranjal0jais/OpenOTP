@@ -61,6 +61,16 @@ public class GlobalExceptionManager {
                         .build());
     }
 
+    @ExceptionHandler(OtpMaxAttemptsException.class)
+    public ResponseEntity<ErrorResponse> handleOtpMaxAttemptsException(OtpMaxAttemptsException e){
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ErrorResponse.builder()
+                        .message(e.getMessage())
+                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                        .build());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException e) {

@@ -1,10 +1,7 @@
 package com.pranjal.otp_service.service;
 
 import com.pranjal.otp_service.entity.OtpRecord;
-import com.pranjal.otp_service.exception.InvalidOtpException;
-import com.pranjal.otp_service.exception.OtpExpiredException;
-import com.pranjal.otp_service.exception.OtpRecordNotFoundException;
-import com.pranjal.otp_service.exception.ResendCooldownException;
+import com.pranjal.otp_service.exception.*;
 import com.pranjal.otp_service.repository.OtpRepository;
 import com.pranjal.otp_service.utility.OtpGenerator;
 import lombok.RequiredArgsConstructor;
@@ -46,21 +43,29 @@ public class OtpService {
         emailService.sendEmail(to, otp);
     }
 
-    public boolean verifyOtp(String email, String otp){
+    public void verifyOtp(String email, String otp){
         OtpRecord record = otpRepository
                 .findTopByEmailAndVerifiedFalseOrderByCreatedAtDesc(email)
                 .orElseThrow(()-> new OtpRecordNotFoundException("No active OTP found for that email"));
+
+        int attempt = record.getAttemptCount();
+
+        if(attempt >= 3){
+            throw new OtpMaxAttemptsException("Max attempts reached. Request a new OTP.");
+        }
 
         if (record.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new OtpExpiredException("OTP found but past expiry time");
         }
 
         if (!record.getOtpCode().equals(otp)) {
+            record.setAttemptCount(record.getAttemptCount() + 1);
+            otpRepository.save(record);
             throw new InvalidOtpException("Wrong OTP code submitted");
         }
+
         record.setVerified(true);
         record.setVerifiedAt(LocalDateTime.now());
         otpRepository.save(record);
-        return true;
     }
 }
