@@ -51,6 +51,16 @@ public class GlobalExceptionManager {
                         .build());
     }
 
+    @ExceptionHandler(ResendCooldownException.class)
+    public ResponseEntity<ErrorResponse> handleResendCooldownException(ResendCooldownException e){
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ErrorResponse.builder()
+                        .message(e.getMessage())
+                        .status(HttpStatus.TOO_MANY_REQUESTS)
+                        .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                        .build());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException e) {
