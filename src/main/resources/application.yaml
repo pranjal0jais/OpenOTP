@@ -21,3 +21,16 @@ spring:
           auth: true
           starttls:
             enable: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+otp:
+  queue:
+    name: otp.email.queue
+    exchange: otp.exchange
+    routing-key: otp.send
+    dlq: otp.email.queue.dlq
+    dlx: otp.exchange.dlx

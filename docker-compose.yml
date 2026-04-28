@@ -11,6 +11,14 @@ services:
       - "${DB_PORT}:3306"
     volumes:
       - otp_data:/var/lib/mysql
-
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: otp_service_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
 volumes:
   otp_data:

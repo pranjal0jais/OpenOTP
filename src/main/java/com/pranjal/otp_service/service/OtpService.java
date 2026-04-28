@@ -1,10 +1,13 @@
 package com.pranjal.otp_service.service;
 
+import com.pranjal.otp_service.dto.OtpEmailMessage;
 import com.pranjal.otp_service.entity.OtpRecord;
 import com.pranjal.otp_service.exception.*;
 import com.pranjal.otp_service.repository.OtpRepository;
 import com.pranjal.otp_service.utility.OtpGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,9 +18,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class OtpService {
-    private final EmailService emailService;
+    private final RabbitTemplate rabbitTemplate;
     private final OtpRepository otpRepository;
     private final RateLimiterService rateLimiterService;
+
+    @Value("${otp.queue.routing-key}")
+    private String routingKey;
+    @Value("${otp.queue.exchange}")
+    private String exchange;
+
     public void sendOtp(String to){
         if(!rateLimiterService.consume(to)){
             throw new RateLimitExceededException("Too many OTP requests. Try again later.");
@@ -43,7 +52,7 @@ public class OtpService {
                 .build();
 
         otpRepository.save(otpRecord);
-        emailService.sendEmail(to, otp);
+        rabbitTemplate.convertAndSend(exchange, routingKey, new OtpEmailMessage(to, otp));
     }
 
     public void verifyOtp(String email, String otp){

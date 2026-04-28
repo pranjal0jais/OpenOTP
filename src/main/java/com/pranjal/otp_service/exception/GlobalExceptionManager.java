@@ -1,6 +1,7 @@
 package com.pranjal.otp_service.exception;
 
 import com.pranjal.otp_service.dto.ErrorResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -94,6 +95,16 @@ public class GlobalExceptionManager {
                         .message(e.getMessage())
                         .status("RATE_LIMIT_EXCEEDED")
                         .statusCode(HttpStatus.TOO_MANY_REQUESTS.value())
+                        .build());
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<ErrorResponse> handleMessagingException(MessagingException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.builder()
+                        .message(e.getMessage())
+                        .status("MESSAGING_ERROR")
+                        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .build());
     }
 }
