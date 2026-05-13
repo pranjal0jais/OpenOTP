@@ -76,12 +76,13 @@ public class OtpService {
         int attempt = record.getAttemptCount();
 
         if(attempt >= maxAttempts){
+            redisOtpRepository.deleteByEmail(email);
             throw new OtpMaxAttemptsException("Max attempts reached. Request a new OTP.");
         }
 
         if (!record.getOtpCode().equals(otp)) {
             record.setAttemptCount(record.getAttemptCount() + 1);
-            redisOtpRepository.save(record);
+            redisOtpRepository.update(record);
             throw new InvalidOtpException("Wrong OTP code submitted");
         }
 

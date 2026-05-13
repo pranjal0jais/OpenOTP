@@ -22,6 +22,14 @@ public class RedisOtpRepository {
         redisTemplate.opsForValue().set(key, redisOtpRecord, Duration.ofMinutes(expiryMinutes));
     }
 
+    public void update(RedisOtpRecord redisOtpRecord) {
+        redisTemplate.opsForValue()
+                .set(
+                        getKey(redisOtpRecord.getEmail()),
+                        redisOtpRecord
+                );
+    }
+
     public Optional<RedisOtpRecord> findByEmail(String email) {
         String key = getKey(email);
         return Optional.ofNullable(redisTemplate.opsForValue().get(key));
