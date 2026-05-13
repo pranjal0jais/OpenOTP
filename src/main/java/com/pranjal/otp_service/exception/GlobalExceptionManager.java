@@ -32,16 +32,6 @@ public class GlobalExceptionManager {
                         .build());
     }
 
-    @ExceptionHandler(OtpExpiredException.class)
-    public ResponseEntity<ErrorResponse> handleOtpExpiredException(OtpExpiredException e){
-        return ResponseEntity.status(HttpStatus.GONE)
-                .body(ErrorResponse.builder()
-                        .message(e.getMessage())
-                        .status("OTP_EXPIRED")
-                        .statusCode(HttpStatus.GONE.value())
-                        .build());
-    }
-
     @ExceptionHandler(InvalidOtpException.class)
     public ResponseEntity<ErrorResponse> handleInvalidOtpException(InvalidOtpException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -49,6 +39,16 @@ public class GlobalExceptionManager {
                         .message(e.getMessage())
                         .status("INVALID_OTP")
                         .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .build());
+    }
+
+    @ExceptionHandler(InvalidHmacException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidHmacException(InvalidHmacException e){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.builder()
+                        .message(e.getMessage())
+                        .status("HMAC_INVALID")
+                        .statusCode(HttpStatus.FORBIDDEN.value())
                         .build());
     }
 

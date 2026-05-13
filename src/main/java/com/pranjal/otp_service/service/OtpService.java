@@ -1,10 +1,11 @@
 package com.pranjal.otp_service.service;
 
 import com.pranjal.otp_service.dto.OtpEmailMessage;
-import com.pranjal.otp_service.entity.OtpRecord;
+import com.pranjal.otp_service.dto.RedisOtpRecord;
 import com.pranjal.otp_service.exception.*;
-import com.pranjal.otp_service.repository.OtpRepository;
+import com.pranjal.otp_service.repository.RedisOtpRepository;
 import com.pranjal.otp_service.utility.OtpGenerator;
+import com.pranjal.otp_service.utility.OtpSignatureUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,14 +14,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OtpService {
     private final RabbitTemplate rabbitTemplate;
-    private final OtpRepository otpRepository;
+    private final RedisOtpRepository redisOtpRepository;
     private final RateLimiterService rateLimiterService;
+    private final OtpSignatureUtility otpSignatureUtility;
 
     @Value("${otp.queue.routing-key}")
     private String routingKey;
@@ -31,7 +32,7 @@ public class OtpService {
         if(!rateLimiterService.consume(to)){
             throw new RateLimitExceededException("Too many OTP requests. Try again later.");
         }
-        Optional<OtpRecord> existingOtp = otpRepository.findTopByEmailOrderByCreatedAtDesc(to);
+        Optional<RedisOtpRecord> existingOtp = redisOtpRepository.findByEmail(to);
         if(existingOtp.isPresent()){
             long difference = ChronoUnit.SECONDS.between(existingOtp.get().getCreatedAt(),
                     LocalDateTime.now());
@@ -41,24 +42,29 @@ public class OtpService {
                         "resending.");
             }
         }
-
         String otp = OtpGenerator.generate();
-        OtpRecord otpRecord = OtpRecord.builder()
-                .otpRecordId(UUID.randomUUID().toString())
+        String signature = otpSignatureUtility.generateHmac(to, otp);
+        RedisOtpRecord redisOtpRecord = RedisOtpRecord.builder()
                 .email(to)
                 .otpCode(otp)
+                .attemptCount(0)
+                .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(5))
-                .verified(false)
+                .signature(signature)
                 .build();
-
-        otpRepository.save(otpRecord);
+        
+        redisOtpRepository.save(redisOtpRecord);
         rabbitTemplate.convertAndSend(exchange, routingKey, new OtpEmailMessage(to, otp));
     }
 
     public void verifyOtp(String email, String otp){
-        OtpRecord record = otpRepository
-                .findTopByEmailAndVerifiedFalseOrderByCreatedAtDesc(email)
+        RedisOtpRecord record = redisOtpRepository
+                .findByEmail(email)
                 .orElseThrow(()-> new OtpRecordNotFoundException("No active OTP found for that email"));
+
+        if(!otpSignatureUtility.verify(email, record.getOtpCode(),  record.getSignature())){
+            throw new InvalidHmacException("HMAC verification failed");
+        }
 
         int attempt = record.getAttemptCount();
 
@@ -66,18 +72,12 @@ public class OtpService {
             throw new OtpMaxAttemptsException("Max attempts reached. Request a new OTP.");
         }
 
-        if (record.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new OtpExpiredException("OTP found but past expiry time");
-        }
-
         if (!record.getOtpCode().equals(otp)) {
             record.setAttemptCount(record.getAttemptCount() + 1);
-            otpRepository.save(record);
+            redisOtpRepository.save(record);
             throw new InvalidOtpException("Wrong OTP code submitted");
         }
 
-        record.setVerified(true);
-        record.setVerifiedAt(LocalDateTime.now());
-        otpRepository.save(record);
+        redisOtpRepository.deleteByEmail(record.getEmail());
     }
 }

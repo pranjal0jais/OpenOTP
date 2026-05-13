@@ -21,6 +21,13 @@ spring:
           auth: true
           starttls:
             enable: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
   rabbitmq:
     host: localhost
     port: 5672
@@ -34,3 +41,6 @@ otp:
     routing-key: otp.send
     dlq: otp.email.queue.dlq
     dlx: otp.exchange.dlx
+
+hmac:
+  secret-key: ${HMAC_SECRET_KEY}

@@ -11,6 +11,7 @@ services:
       - "${DB_PORT}:3306"
     volumes:
       - otp_data:/var/lib/mysql
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: otp_service_rabbitmq
@@ -20,5 +21,19 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
+  redis:
+    image: redis:8.6
+    container_name: otp_service_redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: >
+      sh -c "redis-server --appendonly yes --requirepass $$REDIS_PASSWORD"
+    volumes:
+      - otp_redis_data:/data
+
 volumes:
   otp_data:
+  otp_redis_data:
