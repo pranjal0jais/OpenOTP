@@ -2,6 +2,7 @@ package com.pranjal.otp_service.repository;
 
 import com.pranjal.otp_service.dto.RedisOtpRecord;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,12 +13,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RedisOtpRepository {
     private final RedisTemplate<String, RedisOtpRecord> redisTemplate;
+    @Value("${otp.expiry-minutes}")
+    private Integer expiryMinutes;
 
     public void save(RedisOtpRecord redisOtpRecord) {
         String key = getKey(redisOtpRecord.getEmail());
 
-        redisTemplate.opsForValue().set(key, redisOtpRecord, Duration.ofMinutes(5));
-        redisTemplate.opsForValue().get(key);
+        redisTemplate.opsForValue().set(key, redisOtpRecord, Duration.ofMinutes(expiryMinutes));
     }
 
     public Optional<RedisOtpRecord> findByEmail(String email) {

@@ -27,6 +27,12 @@ public class OtpService {
     private String routingKey;
     @Value("${otp.queue.exchange}")
     private String exchange;
+    @Value("${otp.expiry-minutes}")
+    private int expiryMinutes;
+    @Value("${otp.resend-cooldown-seconds}")
+    private int resendCooldownSeconds;
+    @Value("${otp.max-attempts}")
+    private int maxAttempts;
 
     public void sendOtp(String to){
         if(!rateLimiterService.consume(to)){
@@ -36,8 +42,9 @@ public class OtpService {
         if(existingOtp.isPresent()){
             long difference = ChronoUnit.SECONDS.between(existingOtp.get().getCreatedAt(),
                     LocalDateTime.now());
-            if(difference < 50){
-                throw new ResendCooldownException("Please wait " + (50 - difference) + " seconds " +
+            if(difference < resendCooldownSeconds){
+                throw new ResendCooldownException("Please wait " + (resendCooldownSeconds - difference) + " " +
+                        "seconds " +
                         "before " +
                         "resending.");
             }
@@ -49,7 +56,7 @@ public class OtpService {
                 .otpCode(otp)
                 .attemptCount(0)
                 .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(5))
+                .expiresAt(LocalDateTime.now().plusMinutes(expiryMinutes))
                 .signature(signature)
                 .build();
         
@@ -68,7 +75,7 @@ public class OtpService {
 
         int attempt = record.getAttemptCount();
 
-        if(attempt >= 3){
+        if(attempt >= maxAttempts){
             throw new OtpMaxAttemptsException("Max attempts reached. Request a new OTP.");
         }
 

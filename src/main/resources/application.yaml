@@ -21,12 +21,15 @@ spring:
       password: ${REDIS_PASSWORD}
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 otp:
+  expiry-minutes: ${OTP_EXPIRY_MINUTES:5}
+  resend-cooldown-seconds: ${OTP_RESEND_COOLDOWN_SECONDS:50}
+  max-attempts: ${OTP_MAX_ATTEMPTS:3}
   queue:
     name: otp.email.queue
     exchange: otp.exchange
