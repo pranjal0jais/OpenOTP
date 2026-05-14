@@ -3,6 +3,7 @@ package com.pranjal.otp_service.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +13,7 @@ import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
@@ -33,7 +35,9 @@ public class EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(mailMessage);
+            log.info("Emailed OTP to {}", to);
         } catch (MessagingException e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

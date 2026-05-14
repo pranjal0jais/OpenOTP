@@ -82,7 +82,7 @@ public class GlobalExceptionManager {
                 .orElse("Validation failed");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
-                        .message(e.getMessage())
+                        .message(message)
                         .status("INVALID_FORMAT")
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .build());
