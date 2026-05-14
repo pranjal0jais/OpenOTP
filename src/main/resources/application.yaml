@@ -39,3 +39,6 @@ otp:
 
 hmac:
   secret-key: ${HMAC_SECRET_KEY}
+
+security:
+  api-key: ${API_KEY}
