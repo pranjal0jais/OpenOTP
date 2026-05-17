@@ -13,11 +13,14 @@ import java.util.Base64;
 
 @Component
 public class OtpSignatureUtility {
-    @Value("${hmac.secret-key}")
-    private String secretKey;
+
+    private final String secretKey;
+
+    public OtpSignatureUtility(String secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String generateHmac(String email, String otpCode) {
-
         Mac mac = null;
         try {
             mac = Mac.getInstance("HmacSHA256");

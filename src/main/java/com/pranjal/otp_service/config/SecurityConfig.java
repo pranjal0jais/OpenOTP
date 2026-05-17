@@ -1,6 +1,8 @@
 package com.pranjal.otp_service.config;
 
+import com.pranjal.otp_service.utility.OtpSignatureUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -38,5 +40,10 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .build();
+    }
+
+    @Bean
+    public OtpSignatureUtility otpSignatureUtility(@Value("${hmac.secret-key}") String secretKey) {
+        return new OtpSignatureUtility(secretKey);
     }
 }

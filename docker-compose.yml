@@ -22,5 +22,4 @@ services:
       - otp_redis_data:/data
 
 volumes:
-  otp_data:
   otp_redis_data:

@@ -1,0 +1,11 @@
+target/
+.idea/
+.git/
+.gitignore
+Dockerfile
+README.md
+mvnw
+mvnw.cmd
+.mvn
+otp-service.iml
+HELP.md
