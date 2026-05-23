@@ -4,6 +4,26 @@ A production-grade One-Time Password (OTP) microservice built with Java Spring B
 
 ---
 
+## Quick Start
+
+```bash
+git clone <repository-url>
+
+cd otp-service
+
+cp .env.example .env
+
+docker compose up --build
+```
+
+---
+
+## Self-Hosted
+
+This service is designed to be self-hosted using Docker Compose. No manual installation of Redis or RabbitMQ is required.
+
+---
+
 ## Features
 
 - Send a 6-digit OTP to any email address
@@ -18,11 +38,31 @@ A production-grade One-Time Password (OTP) microservice built with Java Spring B
 
 ---
 
+## Containerized Infrastructure
+
+The service is fully containerized using Docker Compose. The following services run automatically:
+
+- OTP Service (Spring Boot)
+- Redis
+- RabbitMQ
+
+---
+
+## Architecture
+
+```
+Client → Spring Boot API → Redis (OTP storage)
+
+Spring Boot API → RabbitMQ → Email Consumer → SMTP Server
+```
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Spring Boot 4.x |
+| Framework | Spring Boot 3.x |
 | OTP Storage | Redis |
 | Message Broker | RabbitMQ |
 | Email Delivery | Gmail SMTP |
@@ -107,45 +147,73 @@ X-API-KEY: <your-api-key>
 
 ## Environment Variables
 
-Create a `.env` file in the project root:
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your values:
 
 ```env
-REDIS_HOST=
-REDIS_PORT=
-
-RABBITMQ_HOST=
-RABBITMQ_PORT=
-RABBITMQ_USERNAME=
-RABBITMQ_PASSWORD=
-
 MAIL_USERNAME=
 MAIL_PASSWORD=
 
-SECURITY_API_KEY=
-OTP_HMAC_SECRET=
+REDIS_PASSWORD=
+
+RABBITMQ_USERNAME=
+RABBITMQ_PASSWORD=
+
+OTP_EXPIRY_MINUTES=5
+OTP_RESEND_COOLDOWN_SECONDS=50
+OTP_MAX_ATTEMPTS=3
+
+HMAC_SECRET_KEY=
+API_KEY=
 ```
 
 ---
 
-## Running Locally
+## Running the Application
 
 ### Prerequisites
 
-- Java 21+
 - Docker
-- IntelliJ IDEA with EnvFile plugin
-- Gmail account with an App Password configured
+- Docker Compose
 
-### Start Infrastructure
+> Java 21+ only required for local development outside Docker.
+
+### Start the Complete Stack
 
 ```bash
-docker-compose up -d
+docker compose up --build
 ```
 
-### Run the Application
+This starts the Spring Boot application, Redis, and RabbitMQ.
+
+| Service | URL |
+|---|---|
+| Application | http://localhost:8080 |
+| RabbitMQ Dashboard | http://localhost:15672 |
+
+---
+
+## Docker Commands
+
+### Start
 
 ```bash
-./mvnw spring-boot:run
+docker compose up --build
+```
+
+### Stop
+
+```bash
+docker compose down
+```
+
+### View Logs
+
+```bash
+docker compose logs -f
 ```
 
 ---
