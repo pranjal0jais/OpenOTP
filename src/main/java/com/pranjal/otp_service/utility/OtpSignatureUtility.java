@@ -1,6 +1,5 @@
 package com.pranjal.otp_service.utility;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
