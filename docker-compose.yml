@@ -1,4 +1,32 @@
 services:
+  otp-service:
+    build: .
+    container_name: otp_service_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - rabbitmq
+    environment:
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+      OTP_EXPIRY_MINUTES: ${OTP_EXPIRY_MINUTES:-5}
+      OTP_RESEND_COOLDOWN_SECONDS: ${OTP_RESEND_COOLDOWN_SECONDS:-50}
+      OTP_MAX_ATTEMPTS: ${OTP_MAX_ATTEMPTS:-3}
+
+      HMAC_SECRET_KEY: ${HMAC_SECRET_KEY}
+      API_KEY: ${API_KEY}
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: otp_service_rabbitmq
@@ -15,7 +43,7 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6379:6379"
     command: >
       sh -c "redis-server --appendonly yes --requirepass $$REDIS_PASSWORD"
     volumes:
