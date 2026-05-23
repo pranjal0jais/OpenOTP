@@ -1,7 +1,6 @@
 spring:
   application:
     name: otp-service
-server:
   mail:
     host: smtp.gmail.com
     port: 587
@@ -25,7 +24,6 @@ server:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
-  port: ${PORT:8080}
 
 otp:
   expiry-minutes: ${OTP_EXPIRY_MINUTES:5}
@@ -44,4 +42,5 @@ hmac:
 security:
   api-key: ${API_KEY:test-key}
 
-kind: Application
+server:
+  port: ${PORT:8080}
