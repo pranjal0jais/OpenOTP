@@ -24,6 +24,8 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+    ssl:
+      enabled: true
 
 otp:
   expiry-minutes: ${OTP_EXPIRY_MINUTES:5}
