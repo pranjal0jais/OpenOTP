@@ -26,6 +26,7 @@ spring:
     password: ${RABBITMQ_PASSWORD:guest}
     ssl:
       enabled: true
+    virtual-host: ${RABBITMQ_VHOST:/}
 
 otp:
   expiry-minutes: ${OTP_EXPIRY_MINUTES:5}
